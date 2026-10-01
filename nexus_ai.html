@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS-X | QUANTUM FINANCIAL SUITE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        obsidian: '#05070f',
+                        'cyber-card': 'rgba(10, 15, 30, 0.75)',
+                        'neon-cyan': '#00f3ff',
+                        'neon-crimson': '#ff0055',
+                        'neon-gold': '#ffb700',
+                        'neon-magenta': '#d800ff',
+                        'neon-green': '#00ff66'
+                    },
+                    fontFamily: {
+                        orbitron: ['Orbitron', 'sans-serif'],
+                        rajdhani: ['Rajdhani', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+        body {
+            background-color: #05070f;
+            color: #e2e8f0;
+            font-family: 'Rajdhani', sans-serif;
+            overflow-x: hidden;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(5, 7, 15, 0.8);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 243, 255, 0.4);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 243, 255, 0.8);
+        }
+        
+        /* Holographic Glows & Borders */
+        .holo-card {
+            background: linear-gradient(135deg, rgba(13, 20, 40, 0.75) 0%, rgba(5, 8, 20, 0.85) 100%);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5),
+                        inset 0 0 15px rgba(0, 243, 255, 0.05);
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .holo-card:hover {
+            border-color: rgba(0, 243, 255, 0.5);
+            box-shadow: 0 12px 40px 0 rgba(0, 243, 255, 0.15),
+                        inset 0 0 20px rgba(0, 243, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        .holo-card-crimson {
+            border-color: rgba(255, 0, 85, 0.3);
+        }
+        .holo-card-crimson:hover {
+            border-color: rgba(255, 0, 85, 0.6);
+            box-shadow: 0 12px 40px 0 rgba(255, 0, 85, 0.2);
+        }
+        .holo-card-gold {
+            border-color: rgba(255, 183, 0, 0.3);
+        }
+        .holo-card-gold:hover {
+            border-color: rgba(255, 183, 0, 0.6);
+            box-shadow: 0 12px 40px 0 rgba(255, 183, 0, 0.2);
+        }
+
+        /* HUD Corner Accents */
+        .hud-corner-tl {
+            position: absolute; top: -1px; left: -1px; width: 8px; height: 8px;
+            border-top: 2px solid #00f3ff; border-left: 2px solid #00f3ff;
+        }
+        .hud-corner-tr {
+            position: absolute; top: -1px; right: -1px; width: 8px; height: 8px;
+            border-top: 2px solid #00f3ff; border-right: 2px solid #00f3ff;
+        }
+        .hud-corner-bl {
+            position: absolute; bottom: -1px; left: -1px; width: 8px; height: 8px;
+            border-bottom: 2px solid #00f3ff; border-left: 2px solid #00f3ff;
+        }
+        .hud-corner-br {
+            position: absolute; bottom: -1px; right: -1px; width: 8px; height: 8px;
+            border-bottom: 2px solid #00f3ff; border-right: 2px solid #00f3ff;
+        }
+
+        /* Neon Glow Text Effects */
+        .text-glow-cyan {
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.7), 0 0 20px rgba(0, 243, 255, 0.3);
+        }
+        .text-glow-crimson {
+            text-shadow: 0 0 10px rgba(255, 0, 85, 0.7), 0 0 20px rgba(255, 0, 85, 0.3);
+        }
+        .text-glow-gold {
+            text-shadow: 0 0 10px rgba(255, 183, 0, 0.7), 0 0 20px rgba(255, 183, 0, 0.3);
+        }
+
+        /* Grid Overlay Effect */
+        .grid-bg {
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+        }
+
+        /* Animations */
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(1000%); }
+        }
+        .scanline-effect {
+            position: absolute; top: 0; left: 0; right: 0; height: 15px;
+            background: linear-gradient(180deg, rgba(0,243,255,0) 0%, rgba(0,243,255,0.15) 50%, rgba(0,243,255,0) 100%);
+            animation: scanline 8s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.9; }
+        }
+        .animate-pulse-glow {
+            animation: pulseGlow 3s infinite ease-in-out;
+        }
+
+        /* Custom Input styling */
+        input, select, textarea {
+            background: rgba(10, 15, 30, 0.8) !important;
+            border: 1px solid rgba(0, 243, 255, 0.3) !important;
+            color: #00f3ff !important;
+            font-family: 'Rajdhani', sans-serif;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: #00f3ff !important;
+            box-shadow: 0 0 12px rgba(0, 243, 255, 0.4) !important;
+        }
+    </style>
+</head>
+<body class="relative min-h-screen grid-bg flex flex-col justify-between">
+
+    <!-- Interactive Background Particle Canvas Engine -->
+    <canvas id="particleCanvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+    
+    <!-- Top Cyber Scanline overlay -->
+    <div class="scanline-effect z-10"></div>
+
+    <!-- Main Container -->
+    <div class="relative z-10 flex flex-col min-h-screen">
+
+        <!-- Top Executive Cyber Navigation Header -->
+        <header class="border-b border-cyan-500/30 bg-obsidian/90 backdrop-blur-md sticky top-0 z-50 px-4 lg:px-8 py-3">
+            <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+                
+                <!-- Logo & Brand -->
+                <div class="flex items-center gap-3">
+                    <div class="relative w-10 h-10 flex items-center justify-center bg-cyan-950/80 border border-cyan-400/60 rounded-lg shadow-[0_0_15px_rgba(0,243,255,0.3)]">
+                        <span class="font-orbitron font-black text-xl text-cyan-400">NX</span>
+                        <div class="absolute -top-1 -right-1 w-2 h-2 bg-cyan-400 rounded-full animate-ping"></div>
+                    </div>
+                    <div>
+                        <h1 class="font-orbitron font-extrabold text-xl lg:text-2xl tracking-wider text-white flex items-center gap-2">
+                            NEXUS-X <span class="text-xs px-2 py-0.5 rounded bg-cyan-500/20 border border-cyan-400/40 text-cyan-400 font-rajdhani tracking-widest uppercase">QUANTUM v4.0</span>
+                        </h1>
+                        <p class="text-xs text-cyan-400/70 tracking-widest font-mono">HYPER-STYLIZED NEURAL FINANCIAL MATRIX</p>
+                    </div>
+                </div>
+
+                <!-- HUD Quick Stats Banner -->
+                <div class="hidden md:flex items-center gap-6 bg-slate-900/60 border border-cyan-500/20 px-4 py-1.5 rounded-lg text-sm">
+                    <div class="flex items-center gap-2">
+                        <span class="text-gray-400 text-xs">SYSTEM STATUS:</span>
+                        <span class="inline-flex items-center text-neon-green text-xs font-mono">
+                            <span class="w-2 h-2 rounded-full bg-neon-green mr-1.5 animate-pulse"></span> ONLINE
+                        </span>
+                    </div>
+                    <div class="h-4 w-[1px] bg-cyan-500/20"></div>
+                    <div>
+                        <span class="text-gray-400 text-xs">QUANTUM METRIC:</span>
+                        <span id="headerBurnRate" class="text-cyan-400 font-mono font-bold ml-1">OPTIMAL</span>
+                    </div>
+                    <div class="h-4 w-[1px] bg-cyan-500/20"></div>
+                    <div>
+                        <span class="text-gray-400 text-xs">ENCRYPTION:</span>
+                        <span class="text-neon-gold font-mono text-xs">AES-256-QUANTUM</span>
+                    </div>
+                </div>
+
+                <!-- Header Actions & Audio Controls -->
+                <div class="flex items-center gap-3">
+                    <button id="audioToggleBtn" onclick="toggleAudio()" class="px-3 py-1.5 border border-cyan-500/40 hover:border-cyan-400 rounded bg-cyan-950/40 text-cyan-300 hover:text-white text-xs font-mono transition flex items-center gap-1.5 shadow-[0_0_10px_rgba(0,243,255,0.1)]">
+                        <svg id="audioIcon" class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
+                        <span id="audioStatusText">AUDIO: ON</span>
+                    </button>
+
+                    <!-- Export/Import Vault -->
+                    <button onclick="exportVaultData()" class="px-3 py-1.5 border border-amber-500/40 hover:border-amber-400 rounded bg-amber-950/30 text-amber-300 text-xs font-mono transition">
+                        EXPORT VAULT
+                    </button>
+                    <label class="px-3 py-1.5 border border-indigo-500/40 hover:border-indigo-400 rounded bg-indigo-950/30 text-indigo-300 text-xs font-mono transition cursor-pointer">
+                        RESTORE
+                        <input type="file" id="importVaultInput" onchange="importVaultData(event)" class="hidden" accept=".json">
+                    </label>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="max-w-7xl w-full mx-auto p-4 lg:p-8 flex-grow space-y-8">
+
+            <!-- Executive Metric Gauge HUD Grid -->
+            <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                
+                <!-- Balance HUD Card -->
+                <div class="holo-card rounded-xl p-5 relative overflow-hidden">
+                    <div class="hud-corner-tl"></div><div class="hud-corner-tr"></div><div class="hud-corner-bl"></div><div class="hud-corner-br"></div>
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-xs font-mono tracking-widest text-cyan-400/80 uppercase">Net Quantum Liquidity</span>
+                        <span class="p-1.5 rounded bg-cyan-500/10 border border-cyan-400/30 text-cyan-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </span>
+                    </div>
+                    <div id="totalBalance" class="text-3xl font-orbitron font-extrabold text-cyan-300 text-glow-cyan tracking-tight mb-2">$0.00</div>
+                    <div class="flex items-center gap-2 text-xs font-mono text-gray-400">
+                        <span>VELOCITY INDEX:</span>
+                        <span id="velocityIndex" class="text-neon-green font-bold">+14.2% / MO</span>
+                    </div>
+                </div>
+
+                <!-- Monthly Inflow -->
+                <div class="holo-card rounded-xl p-5 relative overflow-hidden">
+                    <div class="hud-corner-tl"></div><div class="hud-corner-tr"></div><div class="hud-corner-bl"></div><div class="hud-corner-br"></div>
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-xs font-mono tracking-widest text-emerald-400/80 uppercase">Total Cyber Inflow</span>
+                        <span class="p-1.5 rounded bg-emerald-500/10 border border-emerald-400/30 text-emerald-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                        </span>
+                    </div>
+                    <div id="totalIncome" class="text-3xl font-orbitron font-extrabold text-emerald-400 text-glow-cyan tracking-tight mb-2">$0.00</div>
+                    <div class="text-xs font-mono text-emerald-400/70 flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span> ACTIVE QUANTUM STREAM
+                    </div>
+                </div>
+
+                <!-- Monthly Outflow -->
+                <div class="holo-card holo-card-crimson rounded-xl p-5 relative overflow-hidden">
+                    <div class="hud-corner-tl"></div><div class="hud-corner-tr"></div><div class="hud-corner-bl"></div><div class="hud-corner-br"></div>
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-xs font-mono tracking-widest text-rose-400/80 uppercase">Capital Outflow Rate</span>
+                        <span class="p-1.5 rounded bg-rose-500/10 border border-rose-400/30 text-rose-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path></svg>
+                        </span>
+                    </div>
+                    <div id="totalExpense" class="text-3xl font-orbitron font-extrabold text-rose-400 text-glow-crimson tracking-tight mb-2">$0.00</div>
+                    <div class="text-xs font-mono text-rose-400/70 flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-rose-500"></span> BURN RATE: <span id="burnRatePercent" class="font-bold text-rose-300">0%</span>
+                    </div>
+                </div>
+
+                <!-- AI Credit / Quantum Score Gauge -->
+                <div class="holo-card holo-card-gold rounded-xl p-5 relative overflow-hidden">
+                    <div class="hud-corner-tl"></div><div class="hud-corner-tr"></div><div class="hud-corner-bl"></div><div class="hud-corner-br"></div>
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-xs font-mono tracking-widest text-amber-400/80 uppercase">AI Neural Matrix Score</span>
+                        <span class="p-1.5 rounded bg-amber-500/10 border border-amber-400/30 text-amber-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                        </span>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <div id="creditScore" class="text-3xl font-orbitron font-extrabold text-amber-300 text-glow-gold tracking-tight">845</div>
+                        <span class="text-xs font-mono text-amber-400/80">/ 900 (QUANTUM)</span>
+                    </div>
+                    <div class="w-full bg-slate-800/80 h-2 rounded-full mt-3 overflow-hidden border border-amber-500/30">
+                        <div id="scoreBar" class="h-full bg-gradient-to-r from-amber-500 to-amber-300 rounded-full transition-all duration-1000" style="width: 90%"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Holographic Visual Wealth Matrix & Transaction Logger Grid -->
+            <section class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                
+                <!-- Left Column: Dynamic Holographic Wealth Chart & Logger (7 cols) -->
+                <div class="lg:col-span-7 space-y-8">
+                    
+                    <!-- Wealth Chart Card -->
+                    <div class="holo-card rounded-2xl p-6 relative">
+                        <div class="hud-corner-tl"></div><div class="hud-corner-tr"></div><div class="hud-corner-bl"></div><div class="hud-corner-br"></div>
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h3 class="font-orbitron font-bold text-lg text-white flex items-center gap-2">
+                                    <span class="w-2.5 h-2.5 bg-cyan-400 rounded-full animate-pulse"></span>
+                                    HOLOGRAPHIC WEALTH MATRIX
+                                </h3>
+                                <p class="text-xs font-mono text-cyan-400/60">REAL-TIME QUANTUM CAPITAL VISUALIZER</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="switchChartMode('flow')" id="btnChartFlow" class="px-2.5 py-1 text-xs font-mono rounded border border-cyan-400/50 bg-cyan-950/60 text-cyan-300 hover:bg-cyan-900/50">FLOW</button>
+                                <button onclick="switchChartMode('cat')" id="btnChartCat" class="px-2.5 py-1 text-xs font-mono rounded border border-slate-700 bg-slate-900/60 text-gray-400 hover:bg-slate-800">BREAKDOWN</button>
+                            </div>
+                        </div>
+
+                        <!-- Dynamic SVG Hologram Canvas Chart -->
+                        <div class="relative h-64 w-full flex items-center justify-center">
+                            <svg id="wealthMatrixSvg" class="w-full h-full overflow-visible" viewBox="0 0 600 220">
+                                <!-- SVG Chart content rendered dynamically by JS -->
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Transaction Input & Management Matrix -->
+                    <div class="holo-card rounded-2xl p-6 relative">
+                        <div class="hud-corner-tl"></div><div class="hud-corner-tr"></div><div class="hud-corner-bl"></div><div class="hud-corner-br"></div>
+                        <h3 class="font-orbitron font-bold text-lg text-white mb-4 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                            QUANTUM TRANSACTION LOGGER
+                        </h3>
+
+                        <!-- Transaction Input Form -->
+                        <form id="transactionForm" onsubmit="addTransaction(event)" class="grid grid-cols-1 sm:grid-cols-12 gap-3 mb-6">
+                            <input type="text" id="txTitle" placeholder="Transaction Entity / Note..." required class="sm:col-span-4 p-2.5 rounded text-sm bg-slate-900 border border-cyan-500/30 text-cyan-300 focus:outline-none">
+                            <input type="number" id="txAmount" placeholder="Amount ($)" step="0.01" required class="sm:col-span-3 p-2.5 rounded text-sm bg-slate-900 border border-cyan-500/30 text-cyan-300 focus:outline-none">
+                            <select id="txType" class="sm:col-span-2 p-2.5 rounded text-sm bg-slate-900 border border-cyan-500/30 text-cyan-300 focus:outline-none">
+                                <option value="expense">Outflow (-)</option>
+                                <option value="income">Inflow (+)</option>
+                            </select>
+                            <select id="txCategory" class="sm:col-span-3 p-2.5 rounded text-sm bg-slate-900 border border-cyan-500/30 text-cyan-300 focus:outline-none">
+                                <option value="Core Matrix">Core Matrix</option>
+                                <option value="Neural Upgrades">Tech & Hardware</option>
+                                <option value="Sub-Network">Subscriptions</option>
+                                <option value="Cyber Fuel">Food & Sustenance</option>
+                                <option value="Crypto Assets">Investments</option>
+                                <option value="Other Protocol">Misc</option>
+                            </select>
+                            <button type="submit" class="sm:col-span-12 py-2.5 rounded font-orbitron font-bold text-sm tracking-widest text-slate-950 bg-gradient-to-r from-cyan-400 via-cyan-300 to-emerald-400 hover:brightness-110 shadow-[0_0_20px_rgba(0,243,255,0.4)] transition">
+                                EXECUTE TRANSACTION
+                            </button>
+                        </form>
+
+                        <!-- Transaction Ledger Feed -->
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-mono text-gray-400">LEDGER HISTORY FEED</span>
+                                <input type="text" id="txSearch" onkeyup="renderTransactions()" placeholder="Filter ledger..." class="px-2 py-1 text-xs rounded bg-slate-900 border border-cyan-500/20 text-cyan-400 w-36">
+                            </div>
+
+                            <div id="transactionList" class="space-y-2 max-h-64 overflow-y-auto pr-1">
+                                <!-- Dynamic Transaction Items rendered here -->
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right Column: Interactive Neural AI Core & Advanced Cyber Tools (5 cols) -->
+                <div class="lg:col-span-5 space-y-8">
+                    
+                    <!-- Neural Core AI Assistant Interface -->
+                    <div class="holo-card rounded-2xl p-6 relative flex flex-col h-[480px]">
+                        <div class="hud-corner-tl"></div><div class="hud-corner-tr"></div><div class="hud-corner-bl"></div><div class="hud-corner-br"></div>
+                        
+                        <!-- AI Neural Header -->
+                        <div class="flex items-center justify-between pb-4 border-b border-cyan-500/20 mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="relative w-9 h-9 rounded-full bg-cyan-950 border border-cyan-400/60 flex items-center justify-center shadow-[0_0_12px_rgba(0,243,255,0.4)]">
+                                    <span class="font-orbitron font-bold text-xs text-cyan-300">AI</span>
+                                    <div class="absolute inset-0 rounded-full border border-cyan-400/40 animate-ping"></div>
+                                </div>
+                                <div>
+                                    <h3 class="font-orbitron font-bold text-white text-sm">NEURAL FINANCIAL CORE</h3>
+                                    <p class="text-[10px] font-mono text-cyan-400/70">GEMINI QUANTUM AGENT ACTIVE</p>
+                                </div>
+                            </div>
+                            <button onclick="clearChatLog()" class="text-[10px] font-mono text-gray-500 hover:text-cyan-400 border border-gray-700 px-2 py-1 rounded">CLEAR</button>
+                        </div>
+
+                        <!-- Chat Stream Output Area -->
+                        <div id="chatStream" class="flex-grow overflow-y-auto space-y-3 pr-2 mb-4 text-sm font-rajdhani">
+                            <div class="bg-slate-900/80 border border-cyan-500/30 p-3 rounded-xl text-cyan-300 text-xs shadow-inner">
+                                <p class="font-bold font-orbitron mb-1 text-cyan-400">🤖 NEXUS-X NEURAL CORE:</p>
+                                Greetings Executive. I am monitoring your quantum financial liquidity matrix. Ask me anything or select a diagnostic shortcut below.
+                            </div>
+                        </div>
+
+                        <!-- Quick Prompt Buttons -->
+                        <div class="grid grid-cols-2 gap-2 mb-3">
+                            <button onclick="executeQuickPrompt('Simulate 6-Month Savings')" class="px-2 py-1.5 text-[11px] font-mono rounded border border-cyan-500/30 bg-cyan-950/30 text-cyan-300 hover:bg-cyan-900/50 hover:border-cyan-400 transition text-left truncate">
+                                📈 6-Mo Forecast
+                            </button>
+                            <button onclick="executeQuickPrompt('Identify Expense Traps')" class="px-2 py-1.5 text-[11px] font-mono rounded border border-rose-500/30 bg-rose-950/30 text-rose-300 hover:bg-rose-900/50 hover:border-rose-400 transition text-left truncate">
+                                🚨 Expense Traps
+                            </button>
+                            <button onclick="executeQuickPrompt('Audit Subscriptions')" class="px-2 py-1.5 text-[11px] font-mono rounded border border-purple-500/30 bg-purple-950/30 text-purple-300 hover:bg-purple-900/50 hover:border-purple-400 transition text-left truncate">
+                                🔍 Audit Subs
+                            </button>
+                            <button onclick="executeQuickPrompt('Crypto & Stock Allocation')" class="px-2 py-1.5 text-[11px] font-mono rounded border border-amber-500/30 bg-amber-950/30 text-amber-300 hover:bg-amber-900/50 hover:border-amber-400 transition text-left truncate">
+                                ⚡ Asset Allocator
+                            </button>
+                        </div>
+
+                        <!-- AI Chat Input Box -->
+                        <div class="flex gap-2">
+                            <input type="text" id="aiInput" placeholder="Query Neural Agent..." onkeydown="if(event.key==='Enter') sendAiMessage()" class="flex-grow p-2 rounded text-xs bg-slate-900 border border-cyan-500/40 text-cyan-300 focus:outline-none">
+                            <button onclick="sendAiMessage()" class="px-4 py-2 rounded bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-orbitron font-bold text-xs shadow-[0_0_12px_rgba(0,243,255,0.5)] transition">
+                                SEND
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Cyber-Vault Goal Planner -->
+                    <div class="holo-card rounded-2xl p-6 relative">
+                        <div class="hud-corner-tl"></div><div class="hud-corner-tr"></div><div class="hud-corner-bl"></div><div class="hud-corner-br"></div>
+                        <h3 class="font-orbitron font-bold text-base text-white mb-4 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                            CYBER-VAULT GOAL TARGETS
+                        </h3>
+
+                        <!-- Target Goal Progress Ring -->
+                        <div id="goalList" class="space-y-4">
+                            <!-- Dynamic Goals Rendered Here -->
+                        </div>
+
+                        <!-- Add New Goal Trigger -->
+                        <button onclick="toggleGoalModal()" class="w-full mt-4 py-2 rounded border border-dashed border-cyan-500/40 text-cyan-400 text-xs font-mono hover:bg-cyan-950/40 transition">
+                            + INITIALIZE NEW GOAL PROTOCOL
+                        </button>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- Time Travel Net Worth Projection Tool -->
+            <section class="holo-card rounded-2xl p-6 relative">
+                <div class="hud-corner-tl"></div><div class="hud-corner-tr"></div><div class="hud-corner-bl"></div><div class="hud-corner-br"></div>
+                
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h3 class="font-orbitron font-bold text-lg text-white flex items-center gap-2">
+                            <span class="text-neon-gold text-xl">⏳</span> "TIME TRAVEL" NET WORTH PROJECTION ENGINE
+                        </h3>
+                        <p class="text-xs font-mono text-cyan-400/60">SIMULATE CAPITAL ACCUMULATION BASED ON CURRENT VELOCITY & YIELD RATIOS</p>
+                    </div>
+                    
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs font-mono text-gray-400">PROJECTION HORIZON:</span>
+                        <span id="timeYearsLabel" class="text-xl font-orbitron font-bold text-cyan-400 text-glow-cyan">5 YEARS</span>
+                    </div>
+                </div>
+
+                <!-- Slider & Projection Controls -->
+                <div class="space-y-6">
+                    <input type="range" id="timeSlider" min="1" max="15" value="5" oninput="updateTimeTravel()" class="w-full accent-cyan-400 cursor-pointer">
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+                        <div class="bg-slate-900/80 border border-cyan-500/20 p-4 rounded-xl">
+                            <span class="text-xs font-mono text-gray-400 block mb-1">ESTIMATED NET WORTH</span>
+                            <span id="projNetWorth" class="text-2xl font-orbitron font-bold text-emerald-400 text-glow-cyan">$0.00</span>
+                        </div>
+                        <div class="bg-slate-900/80 border border-cyan-500/20 p-4 rounded-xl">
+                            <span class="text-xs font-mono text-gray-400 block mb-1">COMPOUND QUANTUM INTEREST</span>
+                            <span id="projInterest" class="text-2xl font-orbitron font-bold text-amber-400 text-glow-gold">$0.00</span>
+                        </div>
+                        <div class="bg-slate-900/80 border border-cyan-500/20 p-4 rounded-xl">
+                            <span class="text-xs font-mono text-gray-400 block mb-1">MONTHLY SAVINGS PACE</span>
+                            <span id="projMonthlyRate" class="text-2xl font-orbitron font-bold text-cyan-300">$0.00 / mo</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Cyber Footer -->
+        <footer class="border-t border-cyan-500/20 bg-obsidian/90 py-4 px-6 text-center text-xs font-mono text-cyan-500/60">
+            NEXUS-X QUANTUM FINANCIAL SUITE &copy; 2026 | ALL SYSTEMS OPERATIONAL | HIGH-STYLIZED CYBERPUNK ARCHITECTURE
+        </footer>
+
+    </div>
+
+    <!-- Modal for Adding Vault Goal -->
+    <div id="goalModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 hidden p-4">
+        <div class="holo-card rounded-2xl max-w-md w-full p-6 relative border border-cyan-400">
+            <div class="hud-corner-tl"></div><div class="hud-corner-tr"></div><div class="hud-corner-bl"></div><div class="hud-corner-br"></div>
+            <h3 class="font-orbitron font-bold text-lg text-white mb-4">INITIALIZE CYBER GOAL</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-mono text-cyan-400 mb-1">GOAL NAME / ASSET</label>
+                    <input type="text" id="goalTitle" placeholder="e.g. Quantum Server Rig" class="w-full p-2 rounded text-sm bg-slate-900 text-cyan-300">
+                </div>
+                <div>
+                    <label class="block text-xs font-mono text-cyan-400 mb-1">TARGET AMOUNT ($)</label>
+                    <input type="number" id="goalTarget" placeholder="e.g. 15000" class="w-full p-2 rounded text-sm bg-slate-900 text-cyan-300">
+                </div>
+                <div>
+                    <label class="block text-xs font-mono text-cyan-400 mb-1">CURRENT SAVED ($)</label>
+                    <input type="number" id="goalCurrent" placeholder="e.g. 3500" class="w-full p-2 rounded text-sm bg-slate-900 text-cyan-300">
+                </div>
+                <div class="flex justify-end gap-3 pt-2">
+                    <button onclick="toggleGoalModal()" class="px-4 py-2 rounded text-xs font-mono text-gray-400 hover:text-white">CANCEL</button>
+                    <button onclick="saveGoal()" class="px-4 py-2 rounded bg-cyan-500 text-slate-950 font-orbitron font-bold text-xs hover:bg-cyan-400 shadow-[0_0_10px_rgba(0,243,255,0.4)]">SAVE PROTOCOL</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Engine JavaScript Logic -->
+    <script>
+        /* -------------------------------------------------------------------------- */
+        /* Web Audio Synthesizer Engine (Spatial Futuristic Audio FX)                 */
+        /* -------------------------------------------------------------------------- */
+        let audioEnabled = true;
+        let audioCtx = null;
+
+        function getAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            const btnText = document.getElementById('audioStatusText');
+            btnText.innerText = audioEnabled ? 'AUDIO: ON' : 'AUDIO: MUTED';
+            if (audioEnabled) playSynthSound('chime');
+        }
+
+        function playSynthSound(type) {
+            if (!audioEnabled) return;
+            try {
+                const ctx = getAudioContext();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                const now = ctx.currentTime;
+
+                if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(800, now);
+                    osc.frequency.exponentialRampToValueAtTime(400, now + 0.05);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                } else if (type === 'chime') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+                    osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+                    osc.start(now);
+                    osc.stop(now + 0.4);
+                } else if (type === 'warn') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(300, now);
+                    osc.frequency.setValueAtTime(150, now + 0.1);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                }
+            } catch(e) { console.log('Audio playback error', e); }
+        }
+
+        /* -------------------------------------------------------------------------- */
+        /* Background Dynamic 3D Node Particle Canvas                                 */
+        /* -------------------------------------------------------------------------- */
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 0.8;
+                this.vy = (Math.random() - 0.5) * 0.8;
+                this.radius = Math.random() * 1.8 + 0.5;
+                this.color = Math.random() > 0.3 ? '#00f3ff' : '#ff0055';
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = this.color;
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 65; i++) {
+            particles.push(new Particle());
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < 120) {
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.strokeStyle = `rgba(0, 243, 255, ${1 - dist / 120 * 0.8})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        /* -------------------------------------------------------------------------- */
+        /* Application State & LocalStorage Management                                */
+        /* -------------------------------------------------------------------------- */
+        let transactions = JSON.parse(localStorage.getItem('nexus_transactions')) || [
+            { id: 1, title: 'Quantum Neural Server', amount: 3200, type: 'income', category: 'Core Matrix', date: '2026-09-28' },
+            { id: 2, title: 'Cyberware Optics Upgrade', amount: 450, type: 'expense', category: 'Neural Upgrades', date: '2026-09-29' },
+            { id: 3, title: 'Orbital Sub-Network', amount: 85, type: 'expense', category: 'Sub-Network', date: '2026-09-30' },
+            { id: 4, title: 'Synthetic Fuel Cells', amount: 120, type: 'expense', category: 'Cyber Fuel', date: '2026-10-01' }
+        ];
+
+        let goals = JSON.parse(localStorage.getItem('nexus_goals')) || [
+            { id: 1, title: 'Orbital Mining Share', target: 20000, current: 13500 },
+            { id: 2, title: 'AI Server Node', target: 5000, current: 3200 }
+        ];
+
+        let chartMode = 'flow'; // 'flow' or 'cat'
+
+        function saveData() {
+            localStorage.setItem('nexus_transactions', JSON.stringify(transactions));
+            localStorage.setItem('nexus_goals', JSON.stringify(goals));
+            updateDashboard();
+        }
+
+        /* -------------------------------------------------------------------------- */
+        /* Transactions Logic & Rendering                                             */
+        /* -------------------------------------------------------------------------- */
+        function addTransaction(e) {
+            e.preventDefault();
+            playSynthSound('chime');
+
+            const title = document.getElementById('txTitle').value;
+            const amount = parseFloat(document.getElementById('txAmount').value);
+            const type = document.getElementById('txType').value;
+            const category = document.getElementById('txCategory').value;
+
+            if (!title || isNaN(amount)) return;
+
+            const newTx = {
+                id: Date.now(),
+                title,
+                amount,
+                type,
+                category,
+                date: new Date().toISOString().split('T')[0]
+            };
+
+            transactions.unshift(newTx);
+            saveData();
+
+            document.getElementById('transactionForm').reset();
+        }
+
+        function deleteTransaction(id) {
+            playSynthSound('warn');
+            transactions = transactions.filter(t => t.id !== id);
+            saveData();
+        }
+
+        function renderTransactions() {
+            const list = document.getElementById('transactionList');
+            const search = document.getElementById('txSearch').value.toLowerCase();
+            list.innerHTML = '';
+
+            const filtered = transactions.filter(t => 
+                t.title.toLowerCase().includes(search) || 
+                t.category.toLowerCase().includes(search)
+            );
+
+            if (filtered.length === 0) {
+                list.innerHTML = `<div class="text-xs text-gray-500 font-mono text-center py-4">NO RECORD FOUND IN MATRIX</div>`;
+                return;
+            }
+
+            filtered.forEach(t => {
+                const isInc = t.type === 'income';
+                const div = document.createElement('div');
+                div.className = `flex items-center justify-between p-2.5 rounded-lg border bg-slate-900/60 ${isInc ? 'border-emerald-500/30' : 'border-rose-500/30'} hover:bg-slate-800/80 transition text-xs font-mono`;
+                
+                div.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="p-1 rounded ${isInc ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}">
+                            ${isInc ? '▲' : '▼'}
+                        </span>
+                        <div>
+                            <div class="text-white font-bold">${t.title}</div>
+                            <div class="text-[10px] text-gray-400">${t.category} • ${t.date}</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="font-orbitron font-bold ${isInc ? 'text-emerald-400' : 'text-rose-400'}">
+                            ${isInc ? '+' : '-'}$${t.amount.toLocaleString(undefined, {minimumFractionDigits:2})}
+                        </span>
+                        <button onclick="deleteTransaction(${t.id})" class="text-gray-500 hover:text-rose-400 transition">✕</button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        /* -------------------------------------------------------------------------- */
+        /* Executive Dashboard Metrics & Visual Wealth Matrix                         */
+        /* -------------------------------------------------------------------------- */
+        function updateDashboard() {
+            let totalInc = 0;
+            let totalExp = 0;
+
+            transactions.forEach(t => {
+                if (t.type === 'income') totalInc += t.amount;
+                else totalExp += t.amount;
+            });
+
+            const netBalance = totalInc - totalExp;
+            const burnRate = totalInc > 0 ? ((totalExp / totalInc) * 100).toFixed(1) : 0;
+
+            document.getElementById('totalBalance').innerText = `$${netBalance.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            document.getElementById('totalIncome').innerText = `$${totalInc.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            document.getElementById('totalExpense').innerText = `$${totalExp.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            document.getElementById('burnRatePercent').innerText = `${burnRate}%`;
+
+            // Quantum Credit Score Calculation Engine
+            let score = 700 + Math.min(200, Math.max(-200, Math.floor((netBalance / 100) - (burnRate * 2))));
+            score = Math.max(300, Math.min(900, score));
+            document.getElementById('creditScore').innerText = score;
+            document.getElementById('scoreBar').style.width = `${(score / 900) * 100}%`;
+
+            renderTransactions();
+            renderGoals();
+            renderHoloChart();
+            updateTimeTravel();
+        }
+
+        function switchChartMode(mode) {
+            playSynthSound('click');
+            chartMode = mode;
+            document.getElementById('btnChartFlow').className = mode === 'flow' ? 
+                'px-2.5 py-1 text-xs font-mono rounded border border-cyan-400/50 bg-cyan-950/60 text-cyan-300' : 
+                'px-2.5 py-1 text-xs font-mono rounded border border-slate-700 bg-slate-900/60 text-gray-400';
+            document.getElementById('btnChartCat').className = mode === 'cat' ? 
+                'px-2.5 py-1 text-xs font-mono rounded border border-cyan-400/50 bg-cyan-950/60 text-cyan-300' : 
+                'px-2.5 py-1 text-xs font-mono rounded border border-slate-700 bg-slate-900/60 text-gray-400';
+            renderHoloChart();
+        }
+
+        function renderHoloChart() {
+            const svg = document.getElementById('wealthMatrixSvg');
+            svg.innerHTML = '';
+
+            if (chartMode === 'flow') {
+                // Wave SVG Line Chart
+                const points = [180, 150, 160, 110, 130, 70, 90, 40];
+                let pathD = `M 0 180 `;
+                points.forEach((pt, idx) => {
+                    const x = (idx / (points.length - 1)) * 600;
+                    pathD += `L ${x} ${pt} `;
+                });
+
+                // Area Fill Gradient
+                svg.innerHTML = `
+                    <defs>
+                        <linearGradient id="chartGlow" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#00f3ff" stop-opacity="0.4"/>
+                            <stop offset="100%" stop-color="#00f3ff" stop-opacity="0.0"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="${pathD} L 600 220 L 0 220 Z" fill="url(#chartGlow)" />
+                    <path d="${pathD}" fill="none" stroke="#00f3ff" stroke-width="3" filter="drop-shadow(0px 0px 8px #00f3ff)" />
+                `;
+
+                points.forEach((pt, idx) => {
+                    const x = (idx / (points.length - 1)) * 600;
+                    svg.innerHTML += `<circle cx="${x}" cy="${pt}" r="4" fill="#ffffff" stroke="#00f3ff" stroke-width="2" />`;
+                });
+            } else {
+                // Category Bar Visualizer
+                const cats = {};
+                transactions.filter(t => t.type === 'expense').forEach(t => {
+                    cats[t.category] = (cats[t.category] || 0) + t.amount;
+                });
+
+                const keys = Object.keys(cats);
+                if (keys.length === 0) {
+                    svg.innerHTML = `<text x="300" y="110" fill="#00f3ff" font-family="Orbitron" font-size="14" text-anchor="middle">NO EXPENSE CATEGORIES RECORDED</text>`;
+                    return;
+                }
+
+                const maxVal = Math.max(...Object.values(cats));
+                keys.forEach((key, idx) => {
+                    const h = (cats[key] / maxVal) * 140;
+                    const x = 50 + idx * (500 / keys.length);
+                    const y = 180 - h;
+
+                    svg.innerHTML += `
+                        <rect x="${x}" y="${y}" width="40" height="${h}" rx="4" fill="rgba(255, 0, 85, 0.6)" stroke="#ff0055" stroke-width="1" />
+                        <text x="${x + 20}" y="200" fill="#a1a1aa" font-family="Rajdhani" font-size="11" text-anchor="middle">${key.substring(0, 8)}</text>
+                    `;
+                });
+            }
+        }
+
+        /* -------------------------------------------------------------------------- */
+        /* Goal Planner Protocol                                                       */
+        /* -------------------------------------------------------------------------- */
+        function renderGoals() {
+            const container = document.getElementById('goalList');
+            container.innerHTML = '';
+
+            goals.forEach(g => {
+                const pct = Math.min(100, Math.round((g.current / g.target) * 100));
+                const div = document.createElement('div');
+                div.className = 'space-y-1.5';
+                div.innerHTML = `
+                    <div class="flex justify-between text-xs font-mono">
+                        <span class="text-white font-bold">${g.title}</span>
+                        <span class="text-amber-400 font-bold">$${g.current} / $${g.target} (${pct}%)</span>
+                    </div>
+                    <div class="w-full bg-slate-900 h-2.5 rounded-full border border-amber-500/30 overflow-hidden">
+                        <div class="bg-gradient-to-r from-amber-500 to-amber-300 h-full rounded-full transition-all duration-700" style="width: ${pct}%"></div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function toggleGoalModal() {
+            playSynthSound('click');
+            const m = document.getElementById('goalModal');
+            m.classList.toggle('hidden');
+        }
+
+        function saveGoal() {
+            const title = document.getElementById('goalTitle').value;
+            const target = parseFloat(document.getElementById('goalTarget').value);
+            const current = parseFloat(document.getElementById('goalCurrent').value) || 0;
+
+            if (!title || isNaN(target)) return;
+
+            goals.push({ id: Date.now(), title, target, current });
+            saveData();
+            toggleGoalModal();
+        }
+
+        /* -------------------------------------------------------------------------- */
+        /* Time Travel Simulator Engine                                               */
+        /* -------------------------------------------------------------------------- */
+        function updateTimeTravel() {
+            const years = parseInt(document.getElementById('timeSlider').value);
+            document.getElementById('timeYearsLabel').innerText = `${years} YEAR${years > 1 ? 'S' : ''}`;
+
+            let totalInc = 0, totalExp = 0;
+            transactions.forEach(t => {
+                if (t.type === 'income') totalInc += t.amount;
+                else totalExp += t.amount;
+            });
+
+            const monthlyNet = Math.max(0, totalInc - totalExp);
+            const rate = 0.07; // 7% annual yield simulation
+
+            let projected = 0;
+            for (let m = 0; m < years * 12; m++) {
+                projected = (projected + monthlyNet) * (1 + rate / 12);
+            }
+
+            const principal = monthlyNet * years * 12;
+            const interest = Math.max(0, projected - principal);
+
+            document.getElementById('projNetWorth').innerText = `$${projected.toLocaleString(undefined, {maximumFractionDigits:0})}`;
+            document.getElementById('projInterest').innerText = `$${interest.toLocaleString(undefined, {maximumFractionDigits:0})}`;
+            document.getElementById('projMonthlyRate').innerText = `$${monthlyNet.toLocaleString(undefined, {maximumFractionDigits:0})} / mo`;
+        }
+
+        /* -------------------------------------------------------------------------- */
+        /* Neural AI Core Assistant Interaction System                                */
+        /* -------------------------------------------------------------------------- */
+        function sendAiMessage() {
+            const input = document.getElementById('aiInput');
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            appendChatMessage('USER', msg);
+            input.value = '';
+
+            setTimeout(() => {
+                generateAiResponse(msg);
+            }, 600);
+        }
+
+        function executeQuickPrompt(promptText) {
+            playSynthSound('click');
+            appendChatMessage('USER', promptText);
+            setTimeout(() => {
+                generateAiResponse(promptText);
+            }, 500);
+        }
+
+        function appendChatMessage(sender, text) {
+            const stream = document.getElementById('chatStream');
+            const div = document.createElement('div');
+
+            if (sender === 'USER') {
+                div.className = 'bg-cyan-950/40 border border-cyan-400/40 p-2.5 rounded-xl text-cyan-200 text-xs ml-6 text-right font-mono';
+                div.innerText = text;
+            } else {
+                div.className = 'bg-slate-900/90 border border-cyan-500/30 p-3 rounded-xl text-cyan-300 text-xs mr-4 shadow-inner';
+                div.innerHTML = `<p class="font-bold font-orbitron mb-1 text-cyan-400">🤖 NEXUS-X AI:</p>${text}`;
+            }
+
+            stream.appendChild(div);
+            stream.scrollTop = stream.scrollHeight;
+        }
+
+        function generateAiResponse(query) {
+            playSynthSound('chime');
+            let response = "";
+
+            let totalInc = 0, totalExp = 0;
+            transactions.forEach(t => t.type === 'income' ? totalInc += t.amount : totalExp += t.amount);
+            const net = totalInc - totalExp;
+
+            if (query.includes('6-Month Savings')) {
+                response = `Based on your monthly surplus of <strong>$${net.toFixed(2)}</strong>, in 6 months your projected liquid reserve will reach <strong>$${(net * 6).toFixed(2)}</strong> (excluding compound yield).`;
+            } else if (query.includes('Expense Traps')) {
+                const subs = transactions.filter(t => t.category === 'Sub-Network' || t.category === 'Subscriptions');
+                response = `Diagnostic complete: Found <strong>${subs.length}</strong> active sub-network protocols. High-frequency non-essential drains detected in Cyber Fuel and Subscriptions. Recommend capping monthly recurring overheads by 15%.`;
+            } else if (query.includes('Audit Subscriptions')) {
+                response = `Subscription Audit Protocol: You are expending capital on recurring nodes. Consider consolidating minor data subscriptions to free up roughly $100-$200/mo into high-yield vault targets.`;
+            } else if (query.includes('Crypto & Stock Allocation')) {
+                response = `Quantum Matrix Recommendation: Allocate 50% to Core Index Assets, 30% to High-Yield Cyber Vaults, and 20% to Liquid Crypto Protocols based on your current score.`;
+            } else {
+                response = `Query Processed: "${query}". System optimal. Net liquidity stands at $${net.toFixed(2)}. Capital velocity index remains positive. Maintain current savings ratios.`;
+            }
+
+            appendChatMessage('AI', response);
+        }
+
+        function clearChatLog() {
+            playSynthSound('click');
+            document.getElementById('chatStream').innerHTML = `
+                <div class="bg-slate-900/80 border border-cyan-500/30 p-3 rounded-xl text-cyan-300 text-xs shadow-inner">
+                    <p class="font-bold font-orbitron mb-1 text-cyan-400">🤖 NEXUS-X NEURAL CORE:</p>
+                    Memory purged. Systems ready for new queries.
+                </div>
+            `;
+        }
+
+        /* -------------------------------------------------------------------------- */
+        /* Export & Import Vault Portability                                           */
+        /* -------------------------------------------------------------------------- */
+        function exportVaultData() {
+            playSynthSound('chime');
+            const data = { transactions, goals };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `NEXUS_X_VAULT_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+        }
+
+        function importVaultData(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const imported = JSON.parse(evt.target.result);
+                    if (imported.transactions && imported.goals) {
+                        transactions = imported.transactions;
+                        goals = imported.goals;
+                        saveData();
+                        playSynthSound('chime');
+                    }
+                } catch(err) {
+                    alert('Invalid Cyber-Vault Data Format.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        /* Initialize on Window Load */
+        window.onload = function() {
+            updateDashboard();
+        }
+    </script>
+</body>
+</html>
